@@ -5,32 +5,44 @@
 //see 12-14 notes
 int client_handshake( int * address ){
   
-  int fd = open("waluigi", O_WRONLY);
+  int toServer = open("waluigi", O_WRONLY);
 
-  mkfifo("test", 0644);
+  char * ppname;
+  sprintf(ppname, "%d", getpid());
   
-  int fromClient = open("test", O_RDONLY);
+  mkfifo(ppname, 0644);
+  
+  int fromServer = open(ppname, O_RDONLY);
 
-  write(fd, "test", 4);
+  //send pipename to server
+  write(toServer, ppname, strlen(ppname));
   
+  //wait for confirmation from server
+  char confirm[8];
+  read(fromServer, confirm, 8);
+  if (!strcmp(confirm, "confirm\n")){
+    //connected
+    remove(ppname);
+  }
   
-  return 0;
+  return toServer;
 }
 
 
 //gets a client pipe - server connects as reader, client connects
 int server_handshake( int * address ){
+
+  //well known pipe
   mkfifo("waluigi", 0644);
 
-  int fd = open("waluigi", O_RDONLY);
+  int fromClient = open("waluigi", O_RDONLY);
 
-  //write(fd, "Welcome!\n", 9);
   char buf[64];
-  read("waluigi", buf, sizeof(buf));
+  read(fromClient, buf, sizeof(buf));
 
   int toClient = open(buf, O_WRONLY);
-  write( toClient, "SCP\n", 4);
+  write( toClient, "confirm\n", 8);
   remove("waluigi");
   
-  return 0;
+  return toClient;
 }
