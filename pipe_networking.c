@@ -8,27 +8,35 @@
 
 //see 12-14 notes
 int client_handshake( int * address ){
-
-  char * ppname;
+  printf("Initializing client\n");
+  
+  char ppname[100];
   sprintf(ppname, "%d", getpid());
   
   mkfifo(ppname, 0644);
-    
+  printf("Created private FIFO\n");
+
   int toServer = open("waluigi", O_WRONLY);
+  printf("Connected to server's wkp\n");
 
+  printf("Client pipe created, waiting for server connection\n");
   
-  int fromServer = open(ppname, O_RDONLY);
-
+ 
   //send pipename to server
-  write(toServer, ppname, strlen(ppname));
-  
+  write(toServer, ppname, strlen(ppname) + 1);
+  printf("Private pipe name sent to server\n");
+  int fromServer = open(ppname, O_RDONLY);
   //wait for confirmation from server
   char confirm[8];
   read(fromServer, confirm, 8);
-  if (!strcmp(confirm, "confirm\n")){
+  if (!strcmp(confirm, "confirm")){
     //connected
+    printf("Private pipe removed\n");
     remove(ppname);
   }
+  
+  write(toServer,"go", 3);
+ 
   
   return toServer;
 }
@@ -39,15 +47,20 @@ int server_handshake( int * address ){
 
   //well known pipe
   mkfifo("waluigi", 0644);
-
+  printf("Server booted\n");
   int fromClient = open("waluigi", O_RDONLY);
-
+  printf("Client connected\n");
+  remove("waluigi");
+  
   char buf[64];
   read(fromClient, buf, sizeof(buf));
-
+  printf("Apparently their private pipe name is %s\n", buf);
   int toClient = open(buf, O_WRONLY);
-  write( toClient, "confirm\n", 8);
-  remove("waluigi");
+  write( toClient, "confirm", 8);
+
+
+  read(fromClient, buf, sizeof(buf));
+  printf("Connection confirmed by client: %s\n", buf);
   
   return toClient;
 }
