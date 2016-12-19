@@ -1,8 +1,6 @@
-compile: client.c server.c pipe_networking.h pipe_networking.c 
-	gcc client.c -o client
-	gcc server.c -o server
-	gcc pipe_networking.c -o pipe_networking
-
+compile: client.c server.c pipe_networking.c 
+	gcc -o client client.c pipe_networking.c
+	gcc -o server server.c pipe_networking.c 
 clean:
 	rm *~
 	rm *.o
