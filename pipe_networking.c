@@ -1,16 +1,21 @@
 #include "pipe_networking.h"
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <stdio.h>
+#include <fcntl.h>
+#include <string.h>
+#include <unistd.h>
 
 //see 12-14 notes
 int client_handshake( int * address ){
-  
-  int toServer = open("waluigi", O_WRONLY);
 
   char * ppname;
   sprintf(ppname, "%d", getpid());
   
   mkfifo(ppname, 0644);
+    
+  int toServer = open("waluigi", O_WRONLY);
+
   
   int fromServer = open(ppname, O_RDONLY);
 
