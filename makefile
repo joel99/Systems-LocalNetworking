@@ -1,20 +1,28 @@
-compile: server.o client.o
-	gcc -o client client.o
-	gcc -o server server.o
+compile: server fserver client
 
-server.o: server.c pipe_networking.c
-	gcc -o server.o server.c pipe_networking.c
+server: server.o pipe_networking.o
+	gcc -o server server.o pipe_networking.o
 
-fall: fserver.o client.o 
-	gcc -o client client.o
-	gcc -o fserver fserver.o
+server.o: server.c pipe_networking.h
+	gcc -c server.c
 
-fserver.o: fserver.c pipe_networking.c
-	gcc -o fserver.o fserver.c pipe_networking.c
+fserver: fserver.o pipe_networking.o
+	gcc -o fserver fserver.o pipe_networking.o
 
-client.o: client.c pipe_networking.c
-	gcc -o client.o client.c pipe_networking.c
+fserver.o: fserver.c pipe_networking.h
+	gcc -c fserver.c
+	
+client: client.o pipe_networking.o
+	gcc -o client client.o pipe_networking.o
+
+client.o: client.c pipe_networking.h
+	gcc -o client.o client.c
+
+pipe_networking.o: pipe_networking.c
+	gcc -c pipe_networking.c
 
 clean:
-	rm *~
-	rm *.o
+	rm -f *~ *.o server fserver client
+
+
+
