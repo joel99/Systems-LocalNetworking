@@ -64,3 +64,12 @@ int server_handshake( int * address ){
   
   return toClient;
 }
+
+int server_handshake1( char * address ){
+  return 0;
+}
+
+int server_handshake2( char * address, int from ){
+  return 0;
+}
+

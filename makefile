@@ -11,12 +11,12 @@ fserver: fserver.o pipe_networking.o
 
 fserver.o: fserver.c pipe_networking.h
 	gcc -c fserver.c
-	
+
 client: client.o pipe_networking.o
 	gcc -o client client.o pipe_networking.o
 
 client.o: client.c pipe_networking.h
-	gcc -o client.o client.c
+	gcc -c client.c
 
 pipe_networking.o: pipe_networking.c
 	gcc -c pipe_networking.c
