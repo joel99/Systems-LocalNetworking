@@ -35,10 +35,10 @@ int client_handshake( int * address ){
     remove(ppname);
   }
   
-  write(toServer,"go", 3);
+  write(*address,"go\n", 4);
  
   
-  return toServer;
+  return fromServer;
 }
 
 
@@ -54,7 +54,7 @@ int server_handshake( int * address ){
   
   char buf[64];
   read(fromClient, buf, sizeof(buf));
-  printf("Apparently their private pipe name is %s\n", buf);
+  printf("private pipe name is %s\n", buf);
   int toClient = open(buf, O_WRONLY);
   write( toClient, "confirm", 8);
 
@@ -66,10 +66,24 @@ int server_handshake( int * address ){
 }
 
 int server_handshake1( char * address ){
-  return 0;
+  mkfifo("waluigi", 0644);
+  printf("Starting handshake\n");
+  int fromClient = open("waluigi", O_RDONLY);
+  printf("Client connected\n");
+  read(fromClient, address, HANDSHAKE_BUFFER_SIZE);
+  remove("waluigi");
+  return fromClient;
 }
 
 int server_handshake2( char * address, int from ){
-  return 0;
+  int toClient = open(address, O_WRONLY);
+  printf("Server connected to private pipe %s\n", address);
+  char buf[MESSAGE_BUFFER_SIZE];
+  write(toClient, "confirm", 8);
+
+  read(from, buf, MESSAGE_BUFFER_SIZE);
+  printf("Client handshake confirmed: %s\n", buf);
+  
+  return toClient;
 }
 
